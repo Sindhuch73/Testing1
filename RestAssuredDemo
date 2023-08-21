@@ -1,0 +1,522 @@
+RESTASSURED PROGRAMS (demo codes)
+package in.amazon.RestAssuredDemo;
+import org.junit.Assert;
+import org.testng.annotations.Test;
+import io.restassured.response.Response;
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+
+public class VerifyCurrencyName {
+	@Test
+	public void verifyCurrencyName() {
+		Response response = RestAssured
+				.when()
+				.get("https://restcountries.com/v3.1/name/japan")
+				.then()
+				.extract().response();
+		JsonPath jsonPath = response.jsonPath();
+		Assert.assertTrue(jsonPath.get("[0].currencies.JPY.name").toString().equals("Japanese yen"));
+		
+	}
+}
+
+
+package in.amazon.RestAssuredDemo;
+import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+public class GETDemo {
+	@Test
+	public void getServerResponse() {
+		RestAssured
+		.when()
+		.get("https://restcountries.com/v3.1/all")
+		.then()
+		.assertThat()
+		.statusCode(200)
+		.log().all();	
+	}
+}
+
+
+package in.amazon.RestAssuredDemo;
+import java.util.HashMap;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+
+public class POSTDemo {	
+	HashMap<String, String> map = new HashMap<String, String>();
+	@BeforeMethod
+	public void createPayLoad() {
+		map.put("name", "morpheus");
+		map.put("job", "painter");
+		RestAssured.baseURI ="https://reqres.in/";
+		RestAssured.basePath = "/api/users";	
+	}
+	@Test
+	public void createResource() {
+		RestAssured
+		.given()
+		.contentType("application/json")
+		.body(map)
+		.when().post()
+.then()
+.statusCode(201)
+.log().all();
+	}
+}
+
+
+package in.amazon.RestAssuredDemo;
+import java.util.HashMap;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+public class PUTDemo {
+	
+	HashMap<String, String> map = new HashMap<String, String>();
+	
+	@BeforeMethod
+	public void cretaePayLoad() {
+		map.put("name", "morpheus");
+		map.put("job", "programmer");
+		RestAssured.baseURI = "https://reqres.in/";
+		RestAssured.basePath = "/api/users/622";
+		}
+	
+	@Test
+	public void updateResource(){
+		RestAssured
+		.given()
+		.contentType("application/json")
+		.body(map)
+		.when()
+		.put()
+		.then().statusCode(200)
+		.log().all();	
+	}
+}
+
+
+package in.amazon.RestAssuredDemo;
+import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+public class DELETEDemo {
+
+	@Test
+	public void deleteResource() {
+	RestAssured.baseURI = "https://reqres.in/";
+	RestAssured.basePath = "/api/users/622";
+	RestAssured
+	.when()
+	.delete()
+	.then()
+	.statusCode(204);
+}
+}
+
+
+package in.amazon.RestAssuredDemo;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.File;
+import org.apache.commons.io.IOUtils;
+import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+public class SOAPDemo {	
+	@Test
+	public void getCaptial() throws IOException {
+		FileInputStream fis = new FileInputStream(new File("capital.xml"));
+		RestAssured.baseURI = "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL";
+		RestAssured
+		      .given()
+		             .header("Content-Type","text/xml")
+		             .body(IOUtils.toString(fis, "UTF-8"))
+		        .when()
+		            .post()
+		        .then()
+		               .statusCode(200)
+		               .log().all();	            
+	}
+}
+
+
+AUTHENTICATIONS
+package in.amazon.RestAssuredDemo;
+import java.util.HashMap;
+import java.util.UUID;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+public class BearerTokenDemo {
+	HashMap<String, String> map = new HashMap<String, String>();
+	UUID uuid = UUID.randomUUID();
+	@BeforeMethod
+	public void createPayLoad() {
+		map.put("name", "Sindhu");
+		map.put("email", uuid+"@gmail.com");
+		map.put("gender", "female");
+		map.put("status", "active");
+		RestAssured.baseURI = "https://gorest.co.in/";
+		RestAssured.basePath = "public/v2/users";
+	}
+	@Test
+	public void createResource() {
+		RestAssured
+		.given()
+		.contentType("application/json")
+		.body(map)
+		.header("Authorization","Bearer 1082d0bb2bbd1f1782ad50b0e30c81e17745e01334212459ef2cc7e089c75aba")
+		.when()
+		.post()
+		.then()
+		.statusCode(201)
+		.log().all();	
+	}
+}
+
+
+	package in.amazon.RestAssuredDemo;
+	import org.testng.annotations.Test;
+	import io.restassured.RestAssured;
+	public class GETDemoBearer {
+		@Test
+		 public void verifyResource() {
+			RestAssured
+			  .given()
+			       .contentType("application/json")
+			       .header("Authorization","Bearer 1082d0bb2bbd1f1782ad50b0e30c81e17745e01334212459ef2cc7e089c75aba")
+			    .when()
+			       .get("https://gorest.co.in/public/v2/users/4495113")
+			    .then()
+			       .statusCode(200)
+			       .log().all();
+		}
+		}
+
+
+package in.amazon.RestAssuredDemo;
+import java.util.HashMap;
+import org.junit.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+
+public class PUTDemoBearerToken {
+	HashMap<String, String> map = new HashMap<String, String>();
+	@BeforeMethod
+	public void createPayLoad() {
+		map.put("name", "Sindu");
+		map.put("email", "chirrasindhu02@gmail.com");
+		map.put("gender", "female");
+		map.put("status", "active");
+		RestAssured.baseURI = "https://gorest.co.in/";
+		RestAssured.basePath = "public/v2/users/4495113";
+	}
+	@Test
+	public void updateResource() {
+		Response response = RestAssured
+		.given()
+		.contentType("application/json")
+		.header("Authorization","Bearer 1082d0bb2bbd1f1782ad50b0e30c81e17745e01334212459ef2cc7e089c75aba")
+		.body(map)
+		.when()
+		.put()
+		.then()
+	.extract().response();
+		JsonPath jsonPath = response.jsonPath();
+		Assert.assertTrue(jsonPath.get("name").toString().equals("Sindu"));
+	}
+}
+
+
+package in.amazon.RestAssuredDemo;
+import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+public class APIKeyDemo {
+	
+	@Test
+	public void getWeatherInfo() {
+		RestAssured
+		.given()
+		.param("q", "Hyderabad")
+		.param("appid", "bf9e752ca212a78c0d64a961a24635fe")
+		.when()
+		.get("https://api.openweathermap.org/data/2.5/weather")
+		.then()
+		.statusCode(200)
+		.log().all();
+	}
+}
+
+
+LOG4j in Eclipse Maven Project
+
+package in.amazon.RestAssuredDemo;
+import java.util.HashMap;
+import java.util.UUID;
+import org.junit.Assert;
+import org.testng.annotations.Test;
+
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import static org.hamcrest.Matchers.is;
+public class Create_Update_Delete_Resource extends TestBase {
+           
+	HashMap<String, String> map = new HashMap<String, String>();
+     
+	UUID uuid = UUID.randomUUID();
+	int id;
+	Response response;
+	JsonPath jsonPath;
+	
+	@Test(priority=0)
+	public void createPayload() {
+		map.put("name", "Captain Planet");
+		map.put("email", uuid + "@gmail.com");
+		map.put("gender", "male");
+		map.put("status", "Active");
+		RestAssured.baseURI = "https://gorest.co.in";
+		RestAssured.basePath = "public/v2/users";
+		logger.info("Payload created");
+	}
+  @Test(priority=1)
+  
+  public void createResource() {
+	  response = RestAssured
+			              .given()
+			                     .contentType("application/json")
+			                     .body(map)
+			                     .header("Authorization", "Bearer 1082d0bb2bbd1f1782ad50b0e30c81e17745e01334212459ef2cc7e089c75aba")
+			               .when()
+			                     .post()
+			               .then()
+			                      .extract().response();
+	  logger.info("Resource Created Successfully");
+	  jsonPath = response.jsonPath();
+	  id = jsonPath.getInt("id");
+	  System.out.println(id);
+			                      
+			                      
+  }
+
+@Test(priority=2)
+
+public void verifyResource() {
+	System.out.println("Id = " + id);
+	RestAssured
+    .given()
+           .contentType("application/json")
+           .header("Authorization", "Bearer 1082d0bb2bbd1f1782ad50b0e30c81e17745e01334212459ef2cc7e089c75aba")
+     .when()
+           .get("https://gorest.co.in/public/v2/users/"+id)
+     .then()
+             .statusCode(200);
+	logger.info("Resource verified");      
+	Assert.assertTrue(jsonPath.get("name").equals("Captain Planet"));	
+}
+
+@Test (priority=3)
+public void updateResource() {
+    map.put("name", "Captain Planett");	
+    map.put("email", uuid + "@gmail.com");
+    map.put("gender", "male");
+    map.put("status", "Active");
+    RestAssured.baseURI = "https://gorest.co.in";
+	RestAssured.basePath = "public/v2/users/" + id;
+	logger.info("Resource updated");
+	RestAssured
+    .given()
+           .contentType("application/json")
+           .header("Authorization", "Bearer 1082d0bb2bbd1f1782ad50b0e30c81e17745e01334212459ef2cc7e089c75aba")
+            .body(map)
+           .when()
+           .put()
+     .then()
+             .statusCode(200)
+            .assertThat()
+            .body("name", is("Captain Planett"));
+	}
+
+@Test (priority=4)
+public void deleteResource() {
+	RestAssured.baseURI = "https://gorest.co.in";
+RestAssured.basePath = "public/v2/users/" + id;
+	
+	RestAssured
+    .given()
+           .contentType("application/json")
+           .header("Authorization", "Bearer 1082d0bb2bbd1f1782ad50b0e30c81e17745e01334212459ef2cc7e089c75aba")
+           .when()
+           .delete()
+     .then()
+             .statusCode(204);
+	logger.info("Resource Deleted");
+}   
+}
+
+
+package in.amazon.RestAssuredDemo;
+import io.restassured.specification.RequestSpecification;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.testng.annotations.BeforeClass;
+import io.restassured.response.Response;
+public class TestBase {
+	
+	public static RequestSpecification httpRequest;
+	public static Response response;
+
+	public Logger logger;
+	
+	@BeforeClass
+	public void setUp() {
+	logger = Logger.getLogger("LogDemo");
+	PropertyConfigurator.configure("log4j.properties");
+	logger.setLevel(Level.DEBUG);	
+	}
+}
+
+
+Dependencies
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>in.amazon</groupId>
+  <artifactId>RestAssuredDemo</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <name>RestAssuredDemo</name>
+  <!-- FIXME change it to the project's website -->
+  <url>http://www.example.com</url>
+
+  <properties>
+		<serenity.version>1.5.8</serenity.version>
+		<serenity.maven.version>1.5.8</serenity.maven.version>
+		<slf4j.version>1.6.1</slf4j.version>
+		<maven.failsafe.plugin.version>2.18</maven.failsafe.plugin.version>
+		<maven.compiler.plugin.version>3.2</maven.compiler.plugin.version>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.serenity-bdd</groupId>
+			<artifactId>serenity-core</artifactId>
+			<version>${serenity.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.serenity-bdd</groupId>
+			<artifactId>serenity-rest-assured</artifactId>
+			<version>${serenity.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>7.1.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- API, java.xml.bind module -->
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+
+		<!-- Runtime, com.sun.xml.bind module -->
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/log4j/log4j-->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+	</dependencies>
+
+  <build>
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+      <plugins>
+        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+        <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.7.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
+
+FILES
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <CapitalCity xmlns="http://www.oorsprong.org/websamples.countryinfo">
+      <sCountryISOCode>USA</sCountryISOCode>
+    </CapitalCity>
+  </soap:Body>
+</soap:Envelope>
+
+
+log4j.rootLogger=ERROR,stdout
+log4j.logger.com.endeca=INFO
+log4j.logger.LogDemo=DEBUG, dest1
+# Logger for crawl metrics
+log4j.logger.com.endeca.itl.web.metrics=INFO
+
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%p\t%d{ISO8601}\t%r\t%c\t[%t]\t%m%n
+
